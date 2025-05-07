@@ -37,16 +37,24 @@
     button:hover {
       background-color: #b3d9ff;
     }
+    button.wrong {
+      background-color: #ff9999 !important;
+    }
     #message {
       font-size: 24px;
       color: green;
       margin-top: 30px;
+    }
+    #timer {
+      font-size: 20px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
 
 <h1>Угадай слово по картинке</h1>
+<div id="timer">Прошло времени: 0 сек</div>
 <img id="picture" src="" alt="Картинка">
 <div class="words" id="buttons"></div>
 <div id="message"></div>
@@ -59,13 +67,23 @@
 
   const usedWords = new Set();
   let currentWord = "";
+  let startTime = Date.now();
+  let timerInterval;
+
+  function updateTimer() {
+    const now = Date.now();
+    const elapsedSeconds = Math.floor((now - startTime) / 1000);
+    document.getElementById("timer").innerText = `Прошло времени: ${elapsedSeconds} сек`;
+  }
 
   function pickRandomWord() {
     const remaining = words.filter(w => !usedWords.has(w));
     if (remaining.length === 0) {
+      clearInterval(timerInterval);
+      const totalTime = Math.floor((Date.now() - startTime) / 1000);
       document.getElementById("picture").style.display = "none";
       document.getElementById("buttons").innerHTML = "";
-      document.getElementById("message").innerText = "Поздравляю! Ты угадал(а) все слова!";
+      document.getElementById("message").innerText = `Поздравляю! Ты угадал(а) все слова за ${totalTime} секунд!`;
       return;
     }
     const index = Math.floor(Math.random() * remaining.length);
@@ -86,7 +104,10 @@
             pickRandomWord();
             renderButtons();
           } else {
-            btn.remove(); // удалить неверный вариант
+            btn.classList.add("wrong");
+            setTimeout(() => {
+              btn.classList.remove("wrong");
+            }, 500);
           }
         };
         container.appendChild(btn);
@@ -94,9 +115,10 @@
     });
   }
 
-  // start
+  // старт
   pickRandomWord();
   renderButtons();
+  timerInterval = setInterval(updateTimer, 1000);
 </script>
 
 </body>
