@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Угадай слово по картинке</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+    img {
+      max-width: 300px;
+      max-height: 300px;
+      margin: 20px auto;
+      border: 2px solid #ccc;
+      background: white;
+    }
+    .words {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #e0e0e0;
+      border: none;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #b3d9ff;
+    }
+    #message {
+      font-size: 24px;
+      color: green;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Угадай слово по картинке</h1>
+<img id="picture" src="" alt="Картинка">
+<div class="words" id="buttons"></div>
+<div id="message"></div>
+
+<script>
+  const words = [
+    "再见", "菜", "打电话", "给。。。打电话", "读",
+    "分钟", "个", "和", "回", "快",
+    "块", "零", "没有", "有", "开",
+    "进", "课", "累"
+  ];
+
+  const usedWords = new Set();
+  let currentWord = "";
+
+  function pickRandomWord() {
+    const remaining = words.filter(w => !usedWords.has(w));
+    if (remaining.length === 0) {
+      document.getElementById("picture").style.display = "none";
+      document.getElementById("buttons").innerHTML = "";
+      document.getElementById("message").innerText = "Поздравляю! Ты угадал(а) все слова!";
+      return;
+    }
+    const index = Math.floor(Math.random() * remaining.length);
+    currentWord = remaining[index];
+    document.getElementById("picture").src = `images/${currentWord}.png`;
+  }
+
+  function renderButtons() {
+    const container = document.getElementById("buttons");
+    container.innerHTML = "";
+    words.forEach(word => {
+      if (!usedWords.has(word)) {
+        const btn = document.createElement("button");
+        btn.innerText = word;
+        btn.onclick = () => {
+          if (word === currentWord) {
+            usedWords.add(word);
+            pickRandomWord();
+            renderButtons();
+          } else {
+            btn.remove(); // удалить неверный вариант
+          }
+        };
+        container.appendChild(btn);
+      }
+    });
+  }
+
+  // start
+  pickRandomWord();
+  renderButtons();
+</script>
+
+</body>
+</html>
